@@ -1,4 +1,5 @@
 using MartialTime.DBProvider;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MartialTime
@@ -11,14 +12,17 @@ namespace MartialTime
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddDistributedMemoryCache();
 
             builder.Services.AddDistributedMemoryCache();
 
             builder.Services.AddSession(options =>
             {
                 options.Cookie.Name = ".AdventureWorks.Session";
-                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.IdleTimeout = TimeSpan.FromHours(2);
+                options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             });
 
             // MySQL Connection...
@@ -37,12 +41,9 @@ namespace MartialTime
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
             app.UseSession();
-
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=SignIn}/{action=SignIn}/{id?}");

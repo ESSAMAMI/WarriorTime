@@ -1,5 +1,6 @@
 ﻿using MartialTime.DBProvider;
 using MartialTime.Models.Form;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MartialTime.Controllers
@@ -21,10 +22,11 @@ namespace MartialTime.Controllers
             return View();
         }
 
-        // POST: SigIn/OpenSession
+        // POST: SignIn/OpenSession
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public RedirectToActionResult OpenSession(SignInForm signIn)
         {
@@ -35,6 +37,7 @@ namespace MartialTime.Controllers
                 {
                     // Connection OK !
                     // Open Session...
+                    HttpContext.Session.SetString("Token", Convert.ToBase64String(Guid.NewGuid().ToByteArray()));
                     HttpContext.Session.SetInt32("Id", student.IdEtudiant);
                     HttpContext.Session.SetString("Name", student.Nom);
                     HttpContext.Session.SetString("SurName", student.Prenom);
