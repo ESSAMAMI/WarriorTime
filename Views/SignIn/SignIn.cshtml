@@ -22,7 +22,12 @@
                                     <strong>Echec de connexion !</strong> Veuillez recommencer...
                                 </div>
                             }
-
+                            @if (TempData["permessionDenied"] != null && (int) TempData["permessionDenied"] == 0)
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    <strong>[403] Action non autorisé!</strong> Veuillez vous connecter...
+                                </div>
+                            }
                             <div class="form-group">
                                 <input asp-for="email" type="email" class="form-control form-control-lg" id="exampleInputEmail1" placeholder="Email" required>
                             </div>
