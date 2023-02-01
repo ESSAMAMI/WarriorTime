@@ -1,5 +1,8 @@
-﻿using MartialTime.Models;
+﻿using System;
+using System.Collections.Generic;
+using MartialTime.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace MartialTime.DBProvider
 {
@@ -26,7 +29,7 @@ namespace MartialTime.DBProvider
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                // #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseMySql("server=localhost;user=root;database=warriortime", ServerVersion.Parse("5.7.24-mysql"));
             }
         }
@@ -203,6 +206,11 @@ namespace MartialTime.DBProvider
                 entity.HasIndex(e => e.IdCours, "fk_inscrit_cours");
 
                 entity.HasIndex(e => e.IdEtudiant, "fk_inscrit_etudiant");
+
+                entity.Property(e => e.DateInscription)
+                    .HasColumnType("datetime")
+                    .HasColumnName("dateInscription")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.IdCours)
                     .HasColumnType("int(50)")
