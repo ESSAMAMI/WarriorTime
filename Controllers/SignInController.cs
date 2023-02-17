@@ -30,25 +30,33 @@ namespace MartialTime.Controllers
         [ValidateAntiForgeryToken]
         public RedirectToActionResult OpenSession(SignInForm signIn)
         {
-            if (signIn.userType != null && signIn.userType.Equals("student"))
+            try
             {
-                var student = _context.Etudiants.Where(e => e.Email.Equals(signIn.email) && e.Mdp.Equals(signIn.password)).FirstOrDefault();
-                if (student != null)
+                if (signIn.userType != null && signIn.userType.Equals("student"))
                 {
-                    // Connection OK !
-                    // Open Session...
-                    HttpContext.Session.SetString("Token", Convert.ToBase64String(Guid.NewGuid().ToByteArray()));
-                    HttpContext.Session.SetInt32("Id", student.IdEtudiant);
-                    HttpContext.Session.SetString("Name", student.Nom);
-                    HttpContext.Session.SetString("SurName", student.Prenom);
-                    HttpContext.Session.SetString("Email", student.Email);
-                    HttpContext.Session.SetString("Tel", student.Telephone);
-                    // Redirect to User Profil
-                    return RedirectToAction(actionName: "StudentProfil", controllerName: "Profil");
+                    var student = QueryDesigner.Login(_context, signIn);
+                    if (student != null)
+                    {
+                        // Connection OK !
+                        // Open Session...
+                        HttpContext.Session.SetString("Token", Convert.ToBase64String(Guid.NewGuid().ToByteArray()));
+                        HttpContext.Session.SetInt32("Id", student.IdEtudiant);
+                        HttpContext.Session.SetString("Name", student.Nom);
+                        HttpContext.Session.SetString("SurName", student.Prenom);
+                        HttpContext.Session.SetString("Email", student.Email);
+                        HttpContext.Session.SetString("Tel", student.Telephone);
+                        HttpContext.Session.SetString("Pwd", student.Mdp);
+                        // Redirect to User Profil
+                        return RedirectToAction(actionName: "StudentProfil", controllerName: "Profil");
+                    }
                 }
+                TempData["connectionStat"] = 0;
+                return RedirectToAction(actionName: "SignIn", controllerName: "SignIn");
             }
-            TempData["connectionStat"] = 0;
-            return RedirectToAction(actionName: "SignIn", controllerName: "SignIn");
+            catch (Exception ex)
+            {
+                throw new Exception("Appication Error !" + ex.Message);
+            }
 
         }
 

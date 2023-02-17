@@ -18,7 +18,7 @@ namespace MartialTime
 
             builder.Services.AddSession(options =>
             {
-                options.Cookie.Name = ".AdventureWorks.Session";
+                options.Cookie.Name = ".MartialTime.Session";
                 options.IdleTimeout = TimeSpan.FromHours(2);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;

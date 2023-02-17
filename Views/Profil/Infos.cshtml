@@ -1,4 +1,4 @@
-﻿@using MartialTime.Models;
+﻿@model MartialTime.Models.Form.UpdatePasswordForm;
 @{
     ViewData["Title"] = "Mes informations";
     var student = ViewBag.Message;
@@ -34,20 +34,22 @@
                 <div class="col-md-6 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Modifier mot de passe</h4>
-                            <div class="form-group">
-                                <label>Ancien mot de passe</label>
-                                <input type="password" class="form-control form-control-lg" placeholder="Ancien mot de passe" aria-label="Password">
-                            </div>
-                            <div class="form-group">
-                                <label>Nouveau mot de passe</label>
-                                <input type="password" class="form-control form-control-lg" placeholder="Nouveau mot de passe" aria-label="NewPassword">
-                            </div>
-                            <div class="form-group">
-                                <label>Confirmer mot de passe</label>
-                                <input type="password" class="form-control form-control-lg" placeholder="Confirmer mot de passe" aria-label="ConfirmPassword">
-                            </div>
-                            <button type="submit" class="btn btn-primary mb-2">Enregistrer</button>
+                            <form asp-controller="Profil" asp-action="UpdatePassword" method="post">
+                                <h4 class="card-title">Modifier mot de passe</h4>
+                                <div class="form-group">
+                                    <label>Ancien mot de passe</label>
+                                    <input type="password" asp-for="OldPassword" class="form-control form-control-lg" placeholder="Ancien mot de passe" aria-label="Password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nouveau mot de passe</label>
+                                    <input type="password" asp-for="NewPassword" class="form-control form-control-lg" placeholder="Nouveau mot de passe" aria-label="NewPassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirmer mot de passe</label>
+                                    <input type="password" asp-for="ConfirmPassword" class="form-control form-control-lg" placeholder="Confirmer mot de passe" aria-label="ConfirmPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary mb-2">Enregistrer</button>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -1,9 +1,13 @@
 ﻿using MartialTime.DBProvider;
 using MartialTime.Models;
+using MartialTime.Models.Form;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Security;
 using System.Data.Entity;
 using System.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MartialTime.Controllers
 {
@@ -20,87 +24,99 @@ namespace MartialTime.Controllers
         [HttpGet]
         public IActionResult StudentProfil()
         {
-            if (! string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+            try
             {
-                // Get all scheduled courses...
-                //var nextStudentCourse = _context.Inscrits.Where(i => i.IdEtudiant == HttpContext.Session.GetInt32("Id"));
+                if (!string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+                {
+                    // Get all scheduled and previos courses...
+                    int id = (int)HttpContext.Session.GetInt32("Id");
+                    ViewBag.NextActivites = QueryDesigner.NextActivites(_context, id);
+                    ViewBag.PreviousActivites = QueryDesigner.PreviousActivites(_context, id);
+                    Random random = new Random();
+                    ViewBag.Rn = float.Parse(String.Format("{0:0.0}", random.NextDouble() * (10 - 0) + 1));
 
-                // SELECT * FROM etudiant e
-                // INNER JOIN inscrit i
-                // ON e.idEtudiant = i.idEtudiant
-                // INNER JOIN cours c
-                // ON c.idCours = i.idCours
-                // INNER JOIN coach co
-                // ON co.idCoach = c.idCoach
-                // INNER JOIN discipline d
-                // ON c.idDiscipline = d.idDiscipline
-
-                var query =
-                        (
-                        from etudiant in _context.Etudiants.Where(e => e.IdEtudiant == HttpContext.Session.GetInt32("Id"))
-                        join inscrit in _context.Inscrits
-                        on etudiant.IdEtudiant equals inscrit.IdEtudiant
-                        join cours in _context.Cours
-                        on inscrit.IdCours equals cours.IdCours
-                        join coach in _context.Coaches
-                        on cours.IdCoach equals coach.IdCoach
-                        join discipline in _context.Disciplines
-                        on cours.IdDiscipline equals discipline.IdDiscipline
-                        join salle in _context.Salles
-                        on cours.IdsalleDeClasse equals salle.IdsalleDeClasse
-                        join typeCours in _context.Typecours
-                        on cours.IdTypeCours equals typeCours.IdTypeCours
-                        select new
-                        {
-                            nomEtudiant = etudiant.Nom,
-                            prenomEtudiant = etudiant.Prenom,
-                            nomCoach = coach.Prenom,
-                            nomDiscipline = discipline.Discipline1, // Cela correspond au nom de la discipline
-                            limitePlace = cours.LimiteEtudiant,
-                            etatDuCours = cours.Statut,
-                            dateCours = cours.DateCours,
-                            dureeCours = cours.Duree,
-                            coursPour = cours.Pour,
-                            nomTypeCours = typeCours.LibelleCours, 
-                            dateInscription = inscrit.DateInscription,
-                            equipement = discipline.Equipement,
-                            etatInscription = inscrit.StudentStatus,
-                            nomSalle = salle.Nom,
-                            capaciteSalle = salle.Capacite
-                        }
-                    ).ToList();
-
-                return View();
+                    return View();
+                }
+                TempData["permessionDenied"] = 0;
+                return RedirectToAction(actionName: "SignIn", controllerName: "SignIn");
             }
-            TempData["permessionDenied"] = 0;
-            return RedirectToAction(actionName: "SignIn", controllerName: "SignIn");
+            catch (Exception ex)
+            {
+                throw new Exception("Appication Error !" + ex.Message);
+            }
 
         }
-
+        [HttpGet]
         public IActionResult LogOut()
         {
-            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+            try
             {
-                // Clear Session...
-                HttpContext.Session.Clear();
+                if (!string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+                {
+                    // Clear Session...
+                    HttpContext.Session.Clear();
+                }
+                // Redirect to Login Page
+                TempData["permessionDenied"] = 0;
+                return RedirectToAction(actionName: "SignIn", controllerName: "SignIn");
             }
-            // Redirect to Login Page
-            TempData["permessionDenied"] = 0;
-            return RedirectToAction(actionName: "SignIn", controllerName: "SignIn");
+            catch (Exception ex)
+            {
+                throw new Exception("Appication Error !" + ex.Message);
+            }
+            
         }
-        
+        [HttpGet]
         public IActionResult Infos()
         {
-            if(!string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+            try
             {
-                var student = _context.Etudiants.Where(e => e.IdEtudiant == HttpContext.Session.GetInt32("Id")).FirstOrDefault();
-                ViewBag.Message = student;
+                if (!string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+                {
+                    var student = _context.Etudiants.Where(e => e.IdEtudiant == HttpContext.Session.GetInt32("Id")).FirstOrDefault();
+                    ViewBag.Message = student;
 
-                return View();
+                    return View();
+                }
+                // Redirect to Login Page
+                TempData["permessionDenied"] = 0;
+                return RedirectToAction(actionName: "SignIn", controllerName: "SignIn");
+            }catch (Exception ex)
+            {
+                throw new Exception("Appication Error !" + ex.Message);
             }
-            // Redirect to Login Page
-            TempData["permessionDenied"] = 0;
-            return RedirectToAction(actionName: "SignIn", controllerName: "SignIn");
+            
+        }
+        [HttpPost]
+        public void UpdatePassword(UpdatePasswordForm formData)
+        {
+            try
+            {
+                /*if (!string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+                {
+                    // Get Data From Form...
+                    if (formData.OldPassword.Equals(HttpContext.Session.GetString("pwd")))
+                    {
+                        if (formData.NewPassword.Equals(formData.NewPassword))
+                        {
+
+                        }
+                        else { TempData["passwordNotConforme"] = 0; }
+                    }
+                    else { TempData["passwordOldNotConforme"] = 0; }
+                    Console.WriteLine("Hello ===========> ");
+                    return RedirectToAction(actionName: "Profil", controllerName: "Infos");
+                }
+                // Redirect to Login Page
+                TempData["permessionDenied"] = 0;
+                return RedirectToAction(actionName: "SignIn", controllerName: "SignIn");*/
+                    
+            }catch (Exception ex)
+            {
+                throw new Exception("Appication Error ! " + ex.Message);
+            }
+            
+            
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -46,7 +46,7 @@
                 <ul class="navbar-nav">
                     <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
                         <h1 class="welcome-text">Bonjour, <span class="text-black fw-bold">@Context.Session.GetString("Name") @Context.Session.GetString("SurName")</span></h1>
-                        <h3 class="welcome-sub-text">Vous pouvez consulter vos cours, ou réservez un créneau !</h3>
+                        <h3 class="welcome-sub-text">Vous pouvez consulter vos cours, ou réserver un créneau !</h3>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">  
@@ -248,7 +248,7 @@
                 <ul class="nav">
                     <li class="nav-item nav-category">Mon planning</li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" asp-action="StudentProfil" asp-controller="Profil">
                             <i class="mdi mdi-grid-large menu-icon"></i>
                             <span class="menu-title">Consulter</span>
                         </a>
